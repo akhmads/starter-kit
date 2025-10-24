@@ -63,16 +63,13 @@
             {{-- MENU --}}
             <x-menu activate-by-route class="text-[13px] font-light">
                 <x-menu-item title="Home" icon="o-home" link="/" />
-
-                @auth
+                <x-menu-item title="Product" icon="o-computer-desktop" link="{{ route('product.index') }}" :hidden="auth()->user()->cannot('view product')" />
 
                 <x-menu-sub title="Users" icon="o-users">
                     <x-menu-item title="Users" link="{{ route('users.index') }}" :hidden="auth()->user()->cannot('view users')" />
                     <x-menu-item title="Roles" link="{{ route('roles.index') }}" :hidden="auth()->user()->cannot('view roles')" />
                     <x-menu-item title="Permissions" link="{{ route('permissions.index') }}" :hidden="auth()->user()->cannot('view permissions')" />
                 </x-menu-sub>
-
-                @endauth
             </x-menu>
         </x-slot:sidebar>
 

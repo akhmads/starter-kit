@@ -11,6 +11,11 @@ Route::prefix('cp')->middleware(['auth'])->group(function () {
 
     Volt::route('/', 'users-bak.index')->name('home');
 
+    Volt::route('/product', 'product.index')->name('product.index');
+    Volt::route('/product/create', 'product.create')->name('product.create');
+    Volt::route('/product/{product}/edit', 'product.edit')->name('product.edit');
+    Volt::route('/product/import', 'product.import')->name('product.import');
+
     Volt::route('/users', 'users.index')->name('users.index');
     Volt::route('/users/create', 'users.create')->name('users.create');
     Volt::route('/users/{user}/edit', 'users.edit')->name('users.edit');
