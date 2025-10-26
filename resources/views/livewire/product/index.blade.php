@@ -142,6 +142,7 @@ new class extends Component {
             with-pagination
             show-empty-text
             per-page="perPage"
+            :link="auth()->user()->can('update product') ? route('product.edit', ['product' => '[id]']) : null"
         >
             @scope('cell_is_active', $product)
             <x-active-badge :status="$product->is_active" />
