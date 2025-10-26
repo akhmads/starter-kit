@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use App\Models\Product;
@@ -10,9 +11,11 @@ new class extends Component {
 
     public Product $product;
 
-    public $code = '';
-    public $name = '';
-    public bool $is_active = false;
+    public $code;
+    public $name;
+    public $description;
+    public $price;
+    public $is_active = false;
 
     public function mount(): void
     {
@@ -23,8 +26,10 @@ new class extends Component {
     public function save(): void
     {
         $data = $this->validate([
-            'code' => 'required|unique:product,code,'.$this->product->id,
+            'code' => ['required', Rule::unique(Product::class)->ignore($this->product)],
             'name' => 'required',
+            'description' => 'nullable',
+            'price' => 'nullable',
             'is_active' => 'boolean',
         ]);
 
@@ -42,13 +47,17 @@ new class extends Component {
     </x-header>
 
     <x-form wire:submit="save">
-        <x-card>
-            <div class="space-y-4">
-                <x-input label="Code" wire:model="code" />
-                <x-input label="Name" wire:model="name" />
-                <x-toggle label="Active" wire:model="is_active" />
-            </div>
-        </x-card>
+        <x-grid cols="2">
+            <x-card class="border border-base-300">
+                <div class="space-y-4">
+                    <x-input label="Code" wire:model="code" class="input-border" />
+                    <x-input label="Name" wire:model="name" />
+                    <x-textarea label="Description" wire:model="description" />
+                    <x-input label="Price" wire:model="price" x-mask:dynamic="$money($input, '.', '')" />
+                    <x-toggle label="Active" wire:model="is_active" />
+                </div>
+            </x-card>
+        </x-grid>
         <x-slot:actions>
             <x-button label="Cancel" link="{{ route('product.index') }}" />
             <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />

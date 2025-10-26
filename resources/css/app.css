@@ -34,6 +34,23 @@
     themes: light --default, dark --prefersdark;
 }
 
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+    --radius-field: 0.6rem;
+    --color-base-content: oklch(20% 0.042 265.755);
+    --btn-color: oklch(100% 0 0);
+    --input-color: oklch(100% 0 0);
+}
+
+[data-theme="light"] {
+    .input,
+    .textarea,
+    .select {
+        @apply shadow-xs border-zinc-300;
+    }
+}
+
 /* maryUI */
 @source "../../vendor/robsontenorio/mary/src/View/Components/**/*.php";
 
@@ -72,6 +89,11 @@
 .textarea {
     &:focus,
     &:focus-within {
-        @apply outline-offset-0 outline-1;
+        @apply outline-offset-0 outline-2 outline-primary;
     }
+}
+
+/* custom table style */
+.table th {
+    @apply font-medium text-[0.8rem];
 }

@@ -36,6 +36,7 @@ new class extends Component {
         return [
             ['key' => 'code', 'label' => 'Code'],
             ['key' => 'name', 'label' => 'Name'],
+            ['key' => 'price', 'label' => 'Price', 'format' => ['currency', '2.,', '']],
             ['key' => 'is_active', 'label' => 'Active', 'class' => 'lg:w-[120px]'],
             ['key' => 'created_at', 'label' => 'Created At', 'class' => 'lg:w-[160px]', 'format' => ['date', 'd-M-y, H:i']],
             ['key' => 'updated_at', 'label' => 'Updated At', 'class' => 'lg:w-[160px]', 'format' => ['date', 'd-M-y, H:i']],
@@ -134,7 +135,7 @@ new class extends Component {
     </x-header>
 
     {{-- TABLE --}}
-    <x-card wire:loading.class="bg-slate-200/50 text-slate-400">
+    <x-card wire:loading.class="bg-slate-200/50 text-slate-400" class="border border-base-300">
         <x-table
             :headers="$headers"
             :rows="$products"
@@ -148,7 +149,7 @@ new class extends Component {
             <x-active-badge :status="$product->is_active" />
             @endscope
             @scope('actions', $product)
-            <div class="flex gap-1.5">
+            <div class="flex gap-0">
                 @can('delete product')
                 <x-button wire:click="delete({{ $product->id }})" spinner="delete({{ $product->id }})" wire:confirm="Are you sure you want to delete this row?" icon="o-trash" class="btn-ghost btn-sm" />
                 @endcan
