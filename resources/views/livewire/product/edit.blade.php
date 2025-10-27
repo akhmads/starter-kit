@@ -33,17 +33,17 @@ new class extends Component {
             'description' => 'nullable',
             'price' => 'nullable',
             'is_active' => 'boolean',
-            'image' => 'required|mimetypes:image/jpg,image/jpeg,image/png|max:3000',
+            'image' => 'nullable|image|mimetypes:image/jpg,image/jpeg,image/png|max:3000',
         ]);
 
-        if ($this->image) {
+        if (is_file($this->image)) {
             $url = $this->image->store('images', 'public');
             $data['image'] =  "/storage/".$url;
         }
 
         $this->product->update($data);
 
-        $this->success('Product successfully updated.', redirectTo: route('product.index'));
+        $this->success('Success','Product successfully updated.', redirectTo: route('product.index'));
     }
 }; ?>
 
@@ -64,7 +64,6 @@ new class extends Component {
                         <x-textarea label="Description" wire:model="description" class="field-sizing-content" />
                         <x-input label="Price" wire:model="price" x-mask:dynamic="$money($input, '.', '')" />
                         <x-select label="Is Active" :options="\App\Enums\ActiveStatus::toSelect()" wire:model="is_active" placeholder="-- Select --" />
-                        {{-- <x-toggle label="Active" wire:model="is_active" /> --}}
                     </div>
                 </x-card>
             </div>

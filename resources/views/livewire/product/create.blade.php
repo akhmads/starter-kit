@@ -30,10 +30,10 @@ new class extends Component {
             'description' => 'nullable',
             'price' => 'nullable',
             'is_active' => 'boolean',
-            'image' => 'required|mimetypes:image/jpg,image/jpeg,image/png|max:3000',
+            'image' => 'required|image|mimetypes:image/jpg,image/jpeg,image/png|max:3000',
         ]);
 
-        if ($this->image) {
+        if (is_file($this->image)) {
             $url = $this->image->store('images', 'public');
             $data['image'] =  "/storage/".$url;
         }

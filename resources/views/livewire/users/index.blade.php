@@ -138,7 +138,7 @@ new class extends Component {
             {{ $user->getRoleNames()->join(', ') }}
             @endscope
             @scope('cell_avatar', $user)
-            <x-avatar image="{{ $user->avatar ?? asset('assets/img/default-avatar.png') }}" class="w-8" />
+            <x-avatar image="{{ $user->avatar ?? asset('assets/img/default-avatar.png') }}" class="w-6" />
             @endscope
             @scope('cell_status', $user)
                 <x-badge :value="$user->is_active->name" class="{{ $user->is_active->color() }}" />

@@ -107,8 +107,11 @@ new class extends Component {
         foreach ( $product->lazy() as $product ) {
             $writer->addRow([
                 'id' => $product->id ?? '',
+                'code' => $product->code ?? '',
                 'name' => $product->name ?? '',
-                'is_active' => $product->is_active ?? '',
+                'description' => $product->description ?? '',
+                'price' => $product->price ?? '',
+                'is_active' => $product->is_active->value ?? '',
             ]);
         }
         return response()->streamDownload(function() use ($writer){
