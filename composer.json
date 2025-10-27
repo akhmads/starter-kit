@@ -16,6 +16,7 @@
         "livewire/volt": "^1.7",
         "robsontenorio/mary": "^2.4",
         "spatie/laravel-permission": "^6.21",
+        "spatie/livewire-filepond": "^1.5",
         "spatie/simple-excel": "^3.8"
     },
     "require-dev": {

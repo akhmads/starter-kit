@@ -43,6 +43,13 @@
     --input-color: oklch(100% 0 0);
 }
 
+@plugin "daisyui/theme" {
+    name: "dark";
+    --radius-field: 0.6rem;
+    --btn-color: var(--btn-bg);
+    --input-color: oklch(20% 0.1 280);
+}
+
 [data-theme="light"] {
     .input,
     .textarea,
@@ -96,4 +103,12 @@
 /* custom table style */
 .table th {
     @apply font-medium text-[0.8rem];
+}
+.table td {
+    @apply truncate;
+}
+
+/* Hide FilePond credits */
+.filepond--credits {
+    display: none !important;
 }

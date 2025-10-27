@@ -115,6 +115,27 @@ new class extends Component {
             $writer->close();
         }, 'Product.xlsx');
     }
+
+    public function fake(): void
+    {
+        $count = 50;
+        $products = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $products[] = [
+                'code' => fake()->unique()->bothify('SKU-####'),
+                'name' => fake()->unique()->words(rand(2, 4), true),
+                'description' => fake()->paragraphs(rand(2, 4), true),
+                'price' => fake()->randomFloat(2, 10, 999),
+                // 'stock' => fake()->numberBetween(0, 100),
+                'is_active' => '1',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('products')->insert($products);
+    }
 }; ?>
 
 <div>
@@ -128,6 +149,9 @@ new class extends Component {
             <x-button label="Import" link="{{ route('product.import') }}" icon="o-arrow-up-tray" />
             @endcan
             <x-button label="Filters" @click="$wire.drawer = true" icon="o-funnel" badge="{{ $filterCount }}" />
+            @env('local')
+            <x-button label="Generate Fake Data" wire:click="fake" spinner="fake" class="btn-primary" />
+            @endenv
             @can('create product')
             <x-button label="Create" link="{{ route('product.create') }}" icon="o-plus" class="btn-primary" />
             @endcan
