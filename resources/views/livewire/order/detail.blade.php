@@ -11,25 +11,24 @@ new class extends Component {
     use Toast, ProductChoice;
 
     public Collection $items;
-    public string $product_id;
-    public string $price;
-    public string $qty;
+    public $product_id;
+    public $price;
+    public $qty;
 
-    public string $mode = '';
-    public string $selected = '';
-    public bool $drawer = false;
+    public $mode = '';
+    public $selected = '';
+    public $drawer = false;
 
     public function mount(Collection $items): void
     {
         $this->items = $items;
-        $this->date = date('Y-m-d');
     }
 
     public function with(): array
     {
         $product_id = $this->items->pluck('product_id')->toArray();
         $products = Product::query()
-            ->select('id', 'name')
+            ->select('id', 'name', 'code')
             ->whereIn('id', $product_id)
             ->get()
             ->keyBy('id');
@@ -76,22 +75,16 @@ new class extends Component {
             'qty' => 'required|numeric|min:1',
         ]);
 
-        if ($this->mode == 'add') {
+        if ($this->mode === 'add') {
             if ($this->items->pluck('product_id')->contains($this->product_id)) {
                 $this->addError('product_id', 'Product already added.');
                 return;
             }
         }
 
-        if ($this->mode == 'add')
+        if ($this->mode === 'add')
         {
-            // $this->items->push((object)[
-            //     'product_id' => $this->product_id,
-            //     'price' => $this->price,
-            //     'qty' => $this->qty,
-            //     'subtotal' => $this->price * $this->qty,
-            // ]);
-            $this->items->put(uniqid(), (object)[
+            $this->items->put(uniqid(), (object) [
                 'product_id' => $this->product_id,
                 'price' => $this->price,
                 'qty' => $this->qty,
@@ -99,7 +92,7 @@ new class extends Component {
             ]);
         }
 
-        if ($this->mode == 'edit')
+        if ($this->mode === 'edit')
         {
             $this->items->transform(function ($data, $key) {
                 if ($key == $this->selected) {
@@ -117,11 +110,12 @@ new class extends Component {
         if ($new == 1)
         {
             $this->clearForm();
+            $this->mode = 'add';
         }
         else
         {
             $this->drawer = false;
-            $this->success('Item has been created.');
+            $this->success('Item successfully created.');
         }
     }
 
@@ -129,7 +123,7 @@ new class extends Component {
     {
         $this->items->forget($id);
         $this->dispatch('items-updated', items: $this->items);
-        $this->success('Item has been deleted.');
+        $this->success('Item successfully deleted.');
     }
 }; ?>
 <div>
@@ -142,10 +136,11 @@ new class extends Component {
             <table class="table">
             <thead>
             <tr>
-                <th>Product</td>
-                <th class="text-right lg:w-40">Price</th>
-                <th class="text-right lg:w-40">Qty</th>
-                <th class="text-right lg:w-40">Subtotal</th>
+                <th class="text-center lg:w-40">Code</th>
+                <th>Product</th>
+                <th class="text-end lg:w-40">Price</th>
+                <th class="text-end lg:w-40">Qty</th>
+                <th class="text-end lg:w-40">Subtotal</th>
                 <th class="lg:w-16"></th>
             </tr>
             </thead>
@@ -156,13 +151,20 @@ new class extends Component {
                 wire:loading.class="cursor-wait"
                 class="divide-x divide-gray-200 dark:divide-gray-900 hover:bg-yellow-50 dark:hover:bg-gray-800 cursor-pointer"
             >
-                <td wire:click="editItem('{{ $key }}')">{{ $products[$item->product_id]->name ?? 'Unknown' }}</td>
-                <td wire:click="editItem('{{ $key }}')" class="text-right">{{ Cast::money($item->price) }}</td>
-                <td wire:click="editItem('{{ $key }}')" class="text-right">{{ Cast::money($item->qty) }}</td>
-                <td wire:click="editItem('{{ $key }}')" class="text-right">{{ Cast::money($item->subtotal) }}</td>
+                <td wire:click="editItem('{{ $key }}')" class="text-center">{{ $products[$item->product_id]->code ?? '' }}</td>
+                <td wire:click="editItem('{{ $key }}')" class="text-start">{{ $products[$item->product_id]->name ?? '' }}</td>
+                <td wire:click="editItem('{{ $key }}')" class="text-end">{{ Cast::money($item->price) }}</td>
+                <td wire:click="editItem('{{ $key }}')" class="text-end">{{ Cast::money($item->qty) }}</td>
+                <td wire:click="editItem('{{ $key }}')" class="text-end">{{ Cast::money($item->subtotal) }}</td>
                 <td>
                     <div class="flex items-center">
-                        <x-button icon="o-x-mark" wire:click="deleteItem('{{ $key }}')" spinner="deleteItem('{{ $key }}')" wire:confirm="Are you sure ?" class="btn-xs btn-ghost text-xs -m-1 text-error" />
+                        <x-button
+                            icon="o-x-mark"
+                            wire:click="deleteItem('{{ $key }}')"
+                            spinner="deleteItem('{{ $key }}')"
+                            wire:confirm="Are you sure ?"
+                            class="btn-xs btn-ghost text-xs -m-1 text-error"
+                        />
                     </div>
                 </td>
             </tr>
@@ -183,27 +185,24 @@ new class extends Component {
 
     {{-- DRAWER --}}
     <x-drawer wire:model="drawer" title="Update Item" right separator with-close-button class="lg:w-1/3">
-        {{-- <x-form wire:submit="saveItem(0)"> --}}
-            <div class="grid gap-5">
-                <x-choices
-                    label="Product"
-                    wire:model="product_id"
-                    :options="$productChoice"
-                    search-function="searchProduct"
-                    option-label="name"
-                    single
-                    searchable
-                    clearable
-                    placeholder="-- Select --"
-                    {{-- :disabled="!$open" --}}
-                />
-                <x-input label="Price" wire:model="price" x-mask:dynamic="$money($input,'.','')" />
-                <x-input label="Qty" wire:model="qty" x-mask:dynamic="$money($input,'.','')" />
-            </div>
-            <x-slot:actions>
-                <x-button label="Save & create another" wire:click="saveItem(1)" spinner="saveItem(1)" />
-                <x-button label="Save" icon="o-paper-airplane" wire:click="saveItem(0)" spinner="saveItem(0)" type="button" class="" class="btn-primary" />
-            </x-slot:actions>
-        {{-- </x-form> --}}
+        <div class="grid gap-5">
+            <x-choices
+                label="Product"
+                wire:model="product_id"
+                :options="$productChoice"
+                search-function="searchProduct"
+                option-label="name"
+                single
+                searchable
+                clearable
+                placeholder="-- Select --"
+            />
+            <x-input label="Price" wire:model="price" x-mask:dynamic="$money($input,'.','')" />
+            <x-input label="Qty" wire:model="qty" x-mask:dynamic="$money($input,'.','')" />
+        </div>
+        <x-slot:actions>
+            <x-button label="Save & create another" wire:click="saveItem(1)" spinner="saveItem(1)" />
+            <x-button label="Save" icon="o-paper-airplane" wire:click="saveItem(0)" spinner="saveItem(0)" type="button" class="btn-primary" />
+        </x-slot:actions>
     </x-drawer>
 </div>

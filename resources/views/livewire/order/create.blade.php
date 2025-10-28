@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Livewire\Attributes\On;
 use Mary\Traits\Toast;
 use App\Models\Order;
 
@@ -12,10 +14,12 @@ new class extends Component {
     public $code;
     public $date;
     public $note;
+    public Collection $items;
 
     public function mount(): void
     {
         Gate::authorize('create order');
+        $this->items = collect([]);
     }
 
     public function save(): void
@@ -26,9 +30,30 @@ new class extends Component {
             'note' => 'nullable',
         ]);
 
-        Order::create($data);
+        if (empty($this->items) || count($this->items) == 0) {
+            $this->addError('items', 'At least one item is required.');
+            return;
+        }
+
+        $data['total'] = $this->items->sum('subtotal');
+        $order = Order::create($data);
+
+        $this->items->each(function ($item, $key) use ($order) {
+            $order->details()->create([
+                'product_id' => $item['product_id'],
+                'price' => $item['price'],
+                'qty' => $item['qty'],
+                'subtotal' => $item['subtotal'],
+            ]);
+        });
 
         $this->success('Success','Order successfully created.', redirectTo: route('order.index'));
+    }
+
+    #[On('items-updated')]
+    public function itemsUpdated($items)
+    {
+        $this->items = collect($items);
     }
 }; ?>
 
@@ -53,6 +78,14 @@ new class extends Component {
                 </x-grid>
             </x-card>
 
+            <div class="overflow-x-auto">
+                @error('items')
+                <div class="flex justify-center">
+                    <span class="text-red-500 text-sm p-1">{{ $message }}</span>
+                </div>
+                @enderror
+                <livewire:order.detail :items="$items" />
+            </div>
         </div>
         <x-slot:actions>
             <x-button label="Cancel" link="{{ route('order.index') }}" />

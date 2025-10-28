@@ -42,7 +42,6 @@ new class extends Component {
             'note' => 'nullable',
         ]);
 
-        // Validasi items secara terpisah
         if (empty($this->items) || count($this->items) == 0) {
             $this->addError('items', 'At least one item is required.');
             return;
