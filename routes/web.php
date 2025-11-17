@@ -9,7 +9,11 @@ Route::get('/', \App\Livewire\Home::class);
 
 Route::prefix('cp')->middleware(['auth'])->group(function () {
 
-    Volt::route('/', 'users-bak.index')->name('home');
+    Volt::route('/', 'dashboard')->name('home');
+
+    Volt::route('/contact', 'contact.index')->name('contact.index');
+    Volt::route('/contact/create', 'contact.create')->name('contact.create');
+    Volt::route('/contact/{contact}/edit', 'contact.edit')->name('contact.edit');
 
     Volt::route('/product', 'product.index')->name('product.index');
     Volt::route('/product/create', 'product.create')->name('product.create');
