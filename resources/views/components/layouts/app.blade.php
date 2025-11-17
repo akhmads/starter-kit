@@ -42,7 +42,7 @@
                 </div> --}}
                 <x-dropdown>
                     <x-slot:trigger>
-                        <x-button class="btn-ghost btn-sm" responsive>
+                        <x-button class="btn btn-ghost btn-sm" responsive>
                             <x-avatar :title="\Illuminate\Support\Str::limit($user->name, 20)" image="{{ $user->avatar ?? asset('assets/img/default-avatar.png') }}" class="h-6" />
                         </x-button>
                     </x-slot:trigger>
