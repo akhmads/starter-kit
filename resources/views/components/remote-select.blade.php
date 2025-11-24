@@ -1,4 +1,5 @@
 @props([
+    'label' => null,
     'option_value' => 'id',
     'option_label' => 'name',
     'remote' => null,
@@ -7,6 +8,10 @@
     'clearable' => false,
 ])
 
+<fieldset class="fieldset {{ $attributes->get('class') }}">
+    @if($label)
+        <legend class="fieldset-legend">{{ $label }}</legend>
+    @endif
 <div
     x-data="{
         open: false,
@@ -140,9 +145,9 @@
     }"
     x-on:click.outside="close()"
     x-on:keydown.escape.window="close()"
-    {{ $attributes->whereDoesntStartWith('wire:model')->except(['initial_value', 'initialValue', 'options'])->merge(['class' => 'relative']) }}
+    {{ $attributes->whereDoesntStartWith('wire:model')->except(['initial_value', 'initialValue', 'options', 'class', 'label'])->merge(['class' => 'relative']) }}
 >
-    <!-- Trigger -->
+    {{-- Trigger --}}
     <div
         x-ref="trigger"
         x-on:click="toggle()"
@@ -156,12 +161,12 @@
         @endif
         tabindex="0"
         class="input input-bordered w-full flex items-center justify-between cursor-pointer focus:outline-offset-2 focus:outline-2 focus:outline-primary"
-        :class="{'input-disabled bg-base-200 cursor-not-allowed': $root.hasAttribute('disabled')}"
+        :class="{'input-disabled bg-base-200 cursor-not-allowed': $root.hasAttribute('disabled'), 'input-error': {{ $errors->has($attributes->wire('model')->value()) ? 'true' : 'false' }} }"
     >
         <span x-text="selected ? selected[optionLabel] : placeholder" class="truncate" :class="{'text-base-content/50': !selected}"></span>
 
         <div class="flex items-center gap-2">
-            <!-- Clear Button -->
+            {{-- Clear Button --}}
             @if($clearable)
             <button
                 x-show="selected && ! $root.hasAttribute('disabled')"
@@ -173,12 +178,12 @@
             </button>
             @endif
 
-            <!-- Chevron -->
+            {{-- Chevron --}}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
         </div>
     </div>
 
-    <!-- Dropdown -->
+    {{-- Dropdown --}}
     <div
         x-ref="dropdown"
         x-anchor.bottom-start="$refs.trigger"
@@ -192,7 +197,7 @@
         class="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-box shadow-lg max-h-60 overflow-auto flex flex-col"
         style="display: none;"
     >
-        <!-- Search Input -->
+        {{-- Search Input --}}
         <div class="p-2 sticky top-0 bg-base-100 z-10 border-b border-base-200">
             <input
                 x-ref="searchInput"
@@ -208,12 +213,12 @@
             >
         </div>
 
-        <!-- Loading -->
+        {{-- Loading --}}
         <div x-show="loading" class="p-4 text-center text-sm text-base-content/50">
             <span class="loading loading-spinner loading-sm"></span> Loading...
         </div>
 
-        <!-- Options -->
+        {{-- Options --}}
         <ul x-ref="optionsList" x-show="!loading && options.length > 0" class="menu menu-sm w-full p-0">
             <template x-for="(option, index) in options" :key="option[optionValue]">
                 <li>
@@ -233,3 +238,7 @@
         </div>
     </div>
 </div>
+    @error($attributes->wire('model')->value())
+        <span class="fieldset-label text-error">{{ $message }}</span>
+    @enderror
+</fieldset>

@@ -1,41 +1,71 @@
 @props([
+    'label' => null,
     'option_value' => 'id',
     'option_label' => 'name',
-    'remote' => null,
+    'options' => [],
     'initial_value' => null,
     'placeholder' => 'Select an option',
     'clearable' => false,
 ])
 
+<fieldset class="fieldset {{ $attributes->get('class') }}">
+    @if($label)
+        <legend class="fieldset-legend">{{ $label }}</legend>
+    @endif
 <div
     x-data="{
         open: false,
         search: '',
         options: [],
+        allOptions: [],
         value: @entangle($attributes->wire('model')),
         selected: null,
-        loading: false,
         highlightedIndex: 0,
         optionValue: '{{ $option_value }}',
         optionLabel: '{{ $option_label }}',
-        remoteUrl: '{{ $remote }}',
         placeholder: '{{ $placeholder }}',
 
         init() {
             let initial = {{ json_encode($initial_value ?? $initialValue) }};
+            let rawOptions = {{ json_encode($options) }};
+
+            // Normalize options if they are key-value pairs (like from pluck)
+            if (Array.isArray(rawOptions)) {
+                this.allOptions = rawOptions;
+            } else if (typeof rawOptions === 'object' && rawOptions !== null) {
+                this.allOptions = Object.entries(rawOptions).map(([key, value]) => {
+                    let obj = {};
+                    obj[this.optionValue] = key;
+                    obj[this.optionLabel] = value;
+                    return obj;
+                });
+            } else {
+                this.allOptions = [];
+            }
+
+            this.options = this.allOptions;
+
             if (this.value && initial) {
                 this.selected = initial;
+            } else if (this.value) {
+                 const found = this.allOptions.find(o => o[this.optionValue] == this.value);
+                 if (found) {
+                     this.selected = found;
+                 }
             }
 
             this.$watch('search', (value) => {
-                if (this.remoteUrl && this.open) {
-                    this.fetchOptions();
-                }
+                this.filterOptions();
             });
 
             this.$watch('value', (val) => {
                 if (!val) {
                     this.selected = null;
+                } else {
+                     const found = this.allOptions.find(o => o[this.optionValue] == val);
+                     if (found) {
+                         this.selected = found;
+                     }
                 }
             });
 
@@ -54,13 +84,12 @@
             if (this.$root.hasAttribute('disabled')) return;
             this.open = !this.open;
             if (this.open) {
+                this.search = '';
+                this.options = this.allOptions;
                 setTimeout(() => {
                     this.$refs.searchInput.focus();
                     this.scrollToHighlighted();
                 }, 50);
-                if (this.options.length === 0 && this.remoteUrl) {
-                    this.fetchOptions();
-                }
             }
         },
 
@@ -99,27 +128,15 @@
             });
         },
 
-        fetchOptions() {
-            this.loading = true;
-            let url = new URL(this.remoteUrl);
-            url.searchParams.append('search', this.search);
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    this.options = data || [];
-                    this.loading = false;
-                    if (this.value && !this.selected) {
-                        const found = this.options.find(o => o[this.optionValue] == this.value);
-                        if (found) {
-                            this.selected = found;
-                        }
-                    }
-                })
-                .catch(() => {
-                    this.loading = false;
-                    this.options = [];
+        filterOptions() {
+            if (this.search === '') {
+                this.options = this.allOptions;
+            } else {
+                const lowerSearch = this.search.toLowerCase();
+                this.options = this.allOptions.filter(option => {
+                    return String(option[this.optionLabel]).toLowerCase().includes(lowerSearch);
                 });
+            }
         },
 
         select(option) {
@@ -140,7 +157,7 @@
     }"
     x-on:click.outside="close()"
     x-on:keydown.escape.window="close()"
-    {{ $attributes->whereDoesntStartWith('wire:model')->except(['initial_value', 'initialValue', 'options'])->merge(['class' => 'relative']) }}
+    {{ $attributes->whereDoesntStartWith('wire:model')->except(['initial_value', 'initialValue', 'options', 'class', 'label'])->merge(['class' => 'relative']) }}
 >
     <!-- Trigger -->
     <div
@@ -156,12 +173,13 @@
         @endif
         tabindex="0"
         class="input input-bordered w-full flex items-center justify-between cursor-pointer focus:outline-offset-2 focus:outline-2 focus:outline-primary"
-        :class="{'input-disabled bg-base-200 cursor-not-allowed': $root.hasAttribute('disabled')}"
+        :class="{'input-disabled bg-base-200 cursor-not-allowed': $root.hasAttribute('disabled'), 'input-error': {{ $errors->has($attributes->wire('model')->value()) ? 'true' : 'false' }} }"
     >
         <span x-text="selected ? selected[optionLabel] : placeholder" class="truncate" :class="{'text-base-content/50': !selected}"></span>
 
         <div class="flex items-center gap-2">
-            <!-- Clear Button -->
+
+            {{-- Clear Button --}}
             @if($clearable)
             <button
                 x-show="selected && ! $root.hasAttribute('disabled')"
@@ -173,12 +191,12 @@
             </button>
             @endif
 
-            <!-- Chevron -->
+            {{-- Chevron --}}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
         </div>
     </div>
 
-    <!-- Dropdown -->
+    {{-- Dropdown --}}
     <div
         x-ref="dropdown"
         x-anchor.bottom-start="$refs.trigger"
@@ -192,7 +210,7 @@
         class="absolute z-50 w-full mt-1 bg-base-100 border border-base-300 rounded-box shadow-lg max-h-60 overflow-auto flex flex-col"
         style="display: none;"
     >
-        <!-- Search Input -->
+        {{-- Search Input --}}
         <div class="p-2 sticky top-0 bg-base-100 z-10 border-b border-base-200">
             <input
                 x-ref="searchInput"
@@ -208,13 +226,8 @@
             >
         </div>
 
-        <!-- Loading -->
-        <div x-show="loading" class="p-4 text-center text-sm text-base-content/50">
-            <span class="loading loading-spinner loading-sm"></span> Loading...
-        </div>
-
-        <!-- Options -->
-        <ul x-ref="optionsList" x-show="!loading && options.length > 0" class="menu menu-sm w-full p-0">
+        {{-- Options --}}
+        <ul x-ref="optionsList" x-show="options.length > 0" class="menu menu-sm w-full p-0">
             <template x-for="(option, index) in options" :key="option[optionValue]">
                 <li>
                     <a
@@ -228,8 +241,12 @@
                 </li>
             </template>
         </ul>
-        <div x-show="!loading && options.length === 0" class="p-4 text-sm text-center text-base-content/50">
+        <div x-show="options.length === 0" class="p-4 text-sm text-center text-base-content/50">
             No results found.
         </div>
     </div>
 </div>
+    @error($attributes->wire('model')->value())
+        <span class="fieldset-label text-error">{{ $message }}</span>
+    @enderror
+</fieldset>

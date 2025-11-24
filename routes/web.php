@@ -15,6 +15,10 @@ Route::prefix('cp')->middleware(['auth'])->group(function () {
     Volt::route('/contact/create', 'contact.create')->name('contact.create');
     Volt::route('/contact/{contact}/edit', 'contact.edit')->name('contact.edit');
 
+    Volt::route('/address', 'address.index')->name('address.index');
+    Volt::route('/address/create', 'address.create')->name('address.create');
+    Volt::route('/address/{address}/edit', 'address.edit')->name('address.edit');
+
     Volt::route('/product', 'product.index')->name('product.index');
     Volt::route('/product/create', 'product.create')->name('product.create');
     Volt::route('/product/{product}/edit', 'product.edit')->name('product.edit');

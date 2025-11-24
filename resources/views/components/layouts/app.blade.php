@@ -65,6 +65,7 @@
             <x-menu activate-by-route class="text-[13px] font-light">
                 <x-menu-item title="Home" icon="o-home" link="/" />
                 <x-menu-item title="Contact" icon="o-book-open" link="{{ route('contact.index') }}" :hidden="auth()->user()->cannot('view contact')" />
+                <x-menu-item title="Address" icon="o-book-open" link="{{ route('address.index') }}" :hidden="auth()->user()->cannot('view address')" />
                 <x-menu-item title="Product" icon="o-computer-desktop" link="{{ route('product.index') }}" :hidden="auth()->user()->cannot('view product')" />
                 <x-menu-item title="Order" icon="o-shopping-bag" link="{{ route('order.index') }}" :hidden="auth()->user()->cannot('view order')" />
 
