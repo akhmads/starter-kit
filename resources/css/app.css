@@ -116,3 +116,8 @@
 .filepond--credits {
     display: none !important;
 }
+
+/* fix loading progress on header */
+.drawer-content progress {
+    @apply h-0.5!;
+}

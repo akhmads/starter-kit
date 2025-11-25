@@ -14,7 +14,7 @@ new class extends Component {
     public $address;
 
     public function mount(): void
-    {
+{
 
     }
 

@@ -42,7 +42,7 @@ new class extends Component {
                     <div class="label">
                         <span class="label-text">Contact</span>
                     </div>
-                    <x-custom-select
+                    <x-remote-select
                         wire:model="contact_id"
                         option_value="id"
                         option_label="label"

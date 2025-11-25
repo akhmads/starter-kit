@@ -11,6 +11,7 @@ new class extends Component {
 
     public $contact_id;
     public $_address;
+    public $test = [];
 
     public function mount(): void
     {
@@ -53,6 +54,17 @@ new class extends Component {
                             option_label="label"
                             :remote="route('api.contacts.index')"
                             :initial_value="['id' => $address->contact_id, 'label' => '#'.$address->contact->id.' - '.$address->contact->name]"
+                            placeholder="Select Contact"
+                            class="w-full"
+                            clearable
+                        />
+                        <x-multi-select
+                            label="Test"
+                            wire:model="test"
+                            option_value="id"
+                            option_label="label"
+                            :remote="route('api.contacts.index')"
+                            {{-- :initial_value="['id' => '1', 'label' => 'Test']" --}}
                             placeholder="Select Contact"
                             class="w-full"
                             clearable
