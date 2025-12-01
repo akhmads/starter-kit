@@ -62,7 +62,7 @@
         <x-slot:sidebar drawer="main-drawer" class="bg-base-100 lg:bg-white lg:border-r lg:border-gray-200 dark:lg:bg-inherit dark:lg:border-none">
 
             {{-- MENU --}}
-            <x-menu activate-by-route class="text-[13px] font-light">
+            <x-menu activate-by-route class="text-[13px]">
                 <x-menu-item title="Home" icon="o-home" link="/" />
                 <x-menu-item title="Contact" icon="o-book-open" link="{{ route('contact.index') }}" :hidden="auth()->user()->cannot('view contact')" />
                 <x-menu-item title="Address" icon="o-book-open" link="{{ route('address.index') }}" :hidden="auth()->user()->cannot('view address')" />

@@ -179,7 +179,7 @@
     >
         <div class="flex flex-wrap gap-1 flex-1">
             <template x-for="(item, index) in selected" :key="item[optionValue]">
-                <div class="badge badge-neutral badge-soft gap-1">
+                <div class="badge badge-neutral badge-soft gap-1 text-base-content">
                     <span x-text="item[optionLabel]"></span>
                     <button type="button" x-on:click.stop="remove(index)" class="btn btn-xs btn-circle btn-ghost h-4 w-4 min-h-0 p-0">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-3 h-3 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
