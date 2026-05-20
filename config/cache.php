@@ -114,4 +114,17 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | When set to false, only primitive types (strings, integers, arrays, etc.)
+    | may be stored in the cache. Set this to an array of class names that
+    | are explicitly allowed to be unserialized from the cache store.
+    |
+    */
+
+    'serializable_classes' => false,
+
 ];
