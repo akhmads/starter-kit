@@ -23,9 +23,9 @@ Laravel and livewire starter-kit
 Clone the repository then go into the application folder
 
 ```
-git clone https://github.com/akhmads/livewire4
+git clone https://github.com/akhmads/lstarter-kit
 
-cd livewire4
+cd starter-kit
 ```
 
 Install composer and node dependencies
