@@ -1,6 +1,6 @@
 ## About
 
-Laravel and livewire starter-kit
+Laravel and Livewire starter kit
 
 ## Tech Stack
 
