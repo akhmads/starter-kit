@@ -2,6 +2,8 @@
 
 Laravel and Livewire starter kit
 
+![YOLO](https://img.shields.io/badge/YOLO-merge--without--review-brightgreen)
+
 ## Tech Stack
 
 -   Laravel
